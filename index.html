@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OYUN KUTUSU | Mini Oyun Portalı</title>
+  <style>
+    :root {
+      --bg: #0b1021;
+      --panel: #141c36;
+      --panel-2: #1c274b;
+      --text: #f3f6ff;
+      --muted: #9aa7cc;
+      --accent: #4f7cff;
+      --accent-2: #00d2a8;
+      --danger: #ff4d6d;
+      --warn: #ffb703;
+      --border: rgba(255, 255, 255, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #172247 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 16, 33, 0.85);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .nav-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #081020;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 28px auto 0;
+      padding: 0 20px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(79, 124, 255, 0.18), rgba(0, 210, 168, 0.12));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero h2 {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(79, 124, 255, 0.5);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--accent-2);
+    }
+
+    .best {
+      font-size: 12px;
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    .card h3 {
+      font-size: 19px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.45;
+    }
+
+    .play-btn {
+      width: 100%;
+      padding: 11px 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #365ef0);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .play-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    /* Oyun Modalı */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 18, 0.8);
+      display: none;
+      place-items: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 680px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .close-btn {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      background: var(--panel-2);
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 640px;
+      height: 360px;
+      display: block;
+      margin: 0 auto;
+      background: #070b18;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .game-box {
+      background: var(--panel-2);
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .choice-btn {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .choice-btn:hover {
+      border-color: var(--accent-2);
+    }
+
+    input[type="number"] {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 16px;
+      width: 160px;
+      text-align: center;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-wrap">
+      <div class="brand">
+        <div class="brand-badge">OK</div>
+        <div>
+          <h1>OYUN KUTUSU</h1>
+          <p>Hemen oyna, rekorunu kır</p>
+        </div>
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-cat="Tümü">Tümü</button>
+        <button class="filter-btn" data-cat="Aksiyon">Aksiyon</button>
+        <button class="filter-btn" data-cat="Zeka">Zeka</button>
+        <button class="filter-btn" data-cat="Refleks">Refleks</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- REKLAM ALANI: İleride reklam kodu eklersen buraya <script> gelebilir -->
+
+    <section class="hero">
+      <div>
+        <h2>5 Mini Oyun Hazır</h2>
+        <p>Klavye veya fare/dokunmatik ile hemen bir oyun seçip oynamaya başla.</p>
+      </div>
+    </section>
+
+    <section class="grid" id="gameGrid"></section>
+  </main>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="modalTitle">Oyun</h3>
+        <button class="close-btn" id="closeModal">Kapat ✕</button>
+      </div>
+      <div class="hud">
+        <span id="hudLeft">Skor: 0</span>
+        <span id="hudRight">En İyi: 0</span>
+      </div>
+      <div id="gameStage"></div>
+      <div class="small-note" id="gameHelp"></div>
+    </div>
+  </div>
+
+  <script>
+    const GAMES = [
+      {
+        id: "space",
+        name: "Uzay Kaçışı",
+        cat: "Aksiyon",
+        desc: "Gelen asteroitlerden kaç, parlayan yıldızları topla ve hızlandıkça hayatta kal."
+      },
+      {
+        id: "math",
+        name: "Hızlı Matematik",
+        cat: "Zeka",
+        desc: "Süre bitmeden toplama, çıkarma ve çarpma işlemlerini çözüp kombo puan biriktir."
+      },
+      {
+        id: "reflex",
+        name: "Refleks Avcısı",
+        cat: "Refleks",
+        desc: "25 saniye içinde beliren hedeflere hızlıca tıkla ve rekor skor yap."
+      },
+      {
+        id: "color",
+        name: "Renk Avı",
+        cat: "Refleks",
+        desc: "Ekranda istenen renge uygun kutuyu zaman dolmadan seç."
+      },
+      {
+        id: "guess",
+        name: "Sayı Tahmini",
+        cat: "Zeka",
+        desc: "1 ile 100 arasındaki gizli sayıyı bul; az denemede bilirsen yüksek puan al."
+      }
+    ];
+
+    const scores = JSON.parse(localStorage.getItem("oyun_kutusu_skorlar") || "{}");
+    let activeCategory = "Tümü";
+    let cleanupGame = null;
+
+    const gridEl = document.getElementById("gameGrid");
+    const modalEl = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const hudLeft = document.getElementById("hudLeft");
+    const hudRight = document.getElementById("hudRight");
+    const gameStage = document.getElementById("gameStage");
+    const gameHelp = document.getElementById("gameHelp");
+
+    function getBest(id) {
+      return scores[id] || 0;
+    }
+
+    function saveBest(id, val) {
+      if (val > getBest(id)) {
+        scores[id] = val;
+        localStorage.setItem("oyun_kutusu_skorlar", JSON.stringify(scores));
+      }
+    }
+
+    function renderCards() {
+      const list = activeCategory === "Tümü"
+        ? GAMES
+        : GAMES.filter((g) => g.cat === activeCategory);
+
+      gridEl.innerHTML = list.map((g) => `
+        <article class="card">
+          <div>
+            <div class="card-top">
+              <span class="tag">${g.cat}</span>
+              <span class="best">Rekor: ${getBest(g.id)}</span>
+            </div>
+            <h3>${g.name}</h3>
+            <p>${g.desc}</p>
+          </div>
+          <button class="play-btn" onclick="openGame('${g.id}')">▶ Oyna</button>
+        </article>
+      `).join("");
+    }
+
+    document.getElementById("filters").addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeCategory = btn.dataset.cat;
+      renderCards();
+    });
+
+    function closeModal() {
+      if (cleanupGame) {
+        cleanupGame();
+        cleanupGame = null;
+      }
+      modalEl.classList.remove("open");
+      renderCards();
+    }
+
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    modalEl.addEventListener("click", (e) => {
+      if (e.target === modalEl) closeModal();
+    });
+
+    function openGame(id) {
+      if (cleanupGame) cleanupGame();
+      const game = GAMES.find((g) => g.id === id);
+      modalTitle.textContent = game.name;
+      hudLeft.textContent = "Skor: 0";
+      hudRight.textContent = `Rekor: ${getBest(id)}`;
+      gameStage.innerHTML = "";
+      gameHelp.textContent = "";
+      modalEl.classList.add("open");
+
+      if (id === "space") startSpaceGame(id);
+      if (id === "math") startMathGame(id);
+      if (id === "reflex") startReflexGame(id);
+      if (id === "color") startColorGame(id);
+      if (id === "guess") startGuessGame(id);
+    }
+
+    // 1. Uzay Kaçışı
+    function startSpaceGame(id) {
+      gameStage.innerHTML = `<canvas id="spaceCanvas" width="640" height="360"></canvas>`;
+      gameHelp.textContent = "Sol/Sağ ok tuşları veya A/D ile hareket et; telefonda ekrana dokun/sürükle.";
+
+      const canvas = document.getElementById("spaceCanvas");
+      const ctx = canvas.getContext("2d");
+      let shipX = canvas.width / 2;
+      const shipY = canvas.height - 36;
+      let score = 0;
+      let speed = 3;
+      let items = [];
+      let keys = {};
+      let over = false;
+      let animId;
+
+      const onKeyDown = (e) => { keys[e.key.toLowerCase()] = true; };
+      const onKeyUp = (e) => { keys[e.key.toLowerCase()] = false; };
+      const onMove = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        shipX = ((clientX - rect.left) / rect.width) * canvas.width;
+      };
+
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+      canvas.addEventListener("mousemove", onMove);
+      canvas.addEventListener("touchmove", onMove, { passive: true });
+
+      function spawn() {
+        const isStar = Math.random() < 0.35;
+        items.push({
+          x: 24 + Math.random() * (canvas.width - 48),
+          y: -20,
+          r: isStar ? 10 : 16,
+          star: isStar
+        });
+      }
+
+      const spawner = setInterval(() => {
+        if (!over) spawn();
+      }, 650);
+
+      function loop() {
+        if (over) return;
+        if (keys["arrowleft"] || keys["a"]) shipX -= 6;
+        if (keys["arrowright"] || keys["d"]) shipX += 6;
+        shipX = Math.max(22, Math.min(canvas.width - 22, shipX));
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Gemi
+        ctx.fillStyle = "#4f7cff";
+        ctx.beginPath();
+        ctx.moveTo(shipX, shipY - 18);
+        ctx.lineTo(shipX - 16, shipY + 14);
+        ctx.lineTo(shipX + 16, shipY + 14);
+        ctx.closePath();
+        ctx.fill();
+
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i];
+          it.y += speed + (it.star ? 0.5 : 1.2);
+
+          ctx.fillStyle = it.star ? "#ffd166" : "#ff4d6d";
+          ctx.beginPath();
+          ctx.arc(it.x, it.y, it.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          const dx = it.x - shipX;
+          const dy = it.y - shipY;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < it.r + 14) {
+            if (it.star) {
+              score += 15;
+              speed = Math.min(9, speed + 0.15);
+              hudLeft.textContent = `Skor: ${score}`;
+              saveBest(id, score);
+              hudRight.textContent = `Rekor: ${getBest(id)}`;
+              items.splice(i, 1);
+            } else {
+              over = true;
+              gameStage.innerHTML = `
+                <div class="game-box">
+                  <h3>Çarpıştın!</h3>
+                  <p>Skorun: <strong>${score}</strong></p>
+                  <button class="play-btn" style="max-width:200px" onclick="openGame('${id}')">Tekrar Oyna</button>
+                </div>`;
+              return;
+            }
+            continue;
+          }
+
+          if (it.y > canvas.height + 30) {
+            items.splice(i, 1);
+          }
+        }
+
+        animId = requestAnimationFrame(loop);
+      }
+
+      animId = requestAnimationFrame(loop);
+
+      cleanupGame = () => {
+        over = true;
+        cancelAnimationFrame(animId);
+        clearInterval(spawner);
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+        canvas.removeEventListener("mousemove", onMove);
+        canvas.removeEventListener("touchmove", onMove);
+      };
+    }
+
+    // 2. Hızlı Matematik
+    function startMathGame(id) {
+      gameHelp.textContent = "40 saniye içinde doğru sonucu seç.";
+      let score = 0;
+      let timeLeft = 40;
+      let answer = 0;
+
+      function nextQuestion() {
+        const ops = ["+", "-", "×"];
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let a = Math.floor(Math.random() * 15) + 2;
+        let b = Math.floor(Math.random() * 12) + 2;
+        if (op === "-") {
+          if (b > a) [a, b] = [b, a];
+          answer = a - b;
+        } else if (op === "+") {
+          answer = a + b;
+        } else {
+          a = Math.floor(Math.random() * 9) + 2;
+          b = Math.floor(Math.random() * 9) + 2;
+          answer = a * b;
+        }
+
+        const options = new Set([answer]);
+        while (options.size < 4) {
+          options.add(answer + (Math.floor(Math.random() * 9) - 4));
+        }
+        const shuffled = [...options].sort(() => Math.random() - 0.5);
+
+        gameStage.innerHTML = `
+          <div class="game-box">
+            <div style="font-size:28px;font-weight:800">${a} ${op} ${b} = ?</div>
+            <div class="choice-grid">
+              ${shuffled.map((opt) => `<button class="choice-btn" data-val="${opt}">${opt}</button>`).join("")}
+            </div>
+          </div>`;
+
+        gameStage.querySelectorAll(".choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (Number(btn.dataset.val) === answer) {
+              score += 10;
+              hudLeft.textContent = `Skor: ${score} | Süre: ${timeLeft}sn`;
+              saveBest(id, score);
+              hudRight.textContent = `Rekor: ${getBest(id)}`;
+              nextQuestion();
+            } else {
+              score = Math.max(0, score - 5);
+              hudLeft.textContent = `Skor: ${score} | Süre: ${timeLeft}sn`;
+            }
+          });
+        });
+      }
+
+      hudLeft.textContent = `Skor: 0 | Süre: ${timeLeft}sn`;
+      nextQuestion();
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        hudLeft.textContent = `Skor: ${score} | Süre: ${timeLeft}sn`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          gameStage.innerHTML = `
+            <div class="game-box">
+              <h3>Süre Doldu!</h3>
+              <p>Toplam Skorun: <strong>${score}</strong></p>
+              <button class="play-btn" style="max-width:200px" onclick="openGame('${id}')">Tekrar Oyna</button>
+            </div>`;
+        }
+      }, 1000);
+
+      cleanupGame = () => clearInterval(timer);
+    }
+
+    // 3. Refleks Avcısı
+    function startReflexGame(id) {
+      gameHelp.textContent = "25 saniye içinde kırmızı hedefleri vur.";
+      let score = 0;
+      let timeLeft = 25;
+
+      gameStage.innerHTML = `
+        <div class="game-box" id="reflexArena" style="position:relative;height:320px;overflow:hidden;"></div>`;
+      const arena = document.getElementById("reflexArena");
+
+      function placeTarget() {
+        arena.innerHTML = "";
+        const target = document.createElement("button");
+        target.textContent = "VUUR";
+        target.style.cssText = `
+          position:absolute;
+          left:${10 + Math.random() * 72}%;
+          top:${12 + Math.random() * 68}%;
+          width:64px;height:64px;border-radius:50%;
+          border:none;background:#ff4d6d;color:#fff;font-weight:800;cursor:pointer;
+        `;
+        target.addEventListener("click", () => {
+          score += 10;
+          hudLeft.textContent = `Skor: ${score} | Süre: ${timeLeft}sn`;
+          saveBest(id, score);
+          hudRight.textContent = `Rekor: ${getBest(id)}`;
+          placeTarget();
+        });
+        arena.appendChild(target);
+      }
+
+      hudLeft.textContent = `Skor: 0 | Süre: ${timeLeft}sn`;
+      placeTarget();
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        hudLeft.textContent = `Skor: ${score} | Süre: ${timeLeft}sn`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          gameStage.innerHTML = `
+            <div class="game-box">
+              <h3>Tur Bitti!</h3>
+              <p>Skorun: <strong>${score}</strong></p>
+              <button class="play-btn" style="max-width:200px" onclick="openGame('${id}')">Tekrar Oyna</button>
+            </div>`;
+        }
+      }, 1000);
+
+      cleanupGame = () => clearInterval(timer);
+    }
+
+    // 4. Renk Avı
+    function startColorGame(id) {
+      const palette = [
+        { name: "Kırmızı", hex: "#ef476f" },
+        { name: "Mavi", hex: "#3a86ff" },
+        { name: "Yeşil", hex: "#06d6a0" },
+        { name: "Sarı", hex: "#ffd166" }
+      ];
+      let score = 0;
+      let lives = 3;
+      gameHelp.textContent = "Üstte adı yazan renge tıkla; 3 canın var.";
+
+      function round() {
+        const target = palette[Math.floor(Math.random() * palette.length)];
+        const choices = [...palette].sort(() => Math.random() - 0.5);
+
+        gameStage.innerHTML = `
+          <div class="game-box">
+            <p style="color:var(--muted)">Şu rengi bul:</p>
+            <div style="font-size:28px;font-weight:800">${target.name}</div>
+            <div class="choice-grid">
+              ${choices.map((c) => `
+                <button class="choice-btn" style="background:${c.hex};color:#081020" data-name="${c.name}">${c.name}</button>
+              `).join("")}
+            </div>
+          </div>`;
+
+        gameStage.querySelectorAll(".choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (btn.dataset.name === target.name) {
+              score += 10;
+              saveBest(id, score);
+              hudRight.textContent = `Rekor: ${getBest(id)}`;
+            } else {
+              lives--;
+            }
+            hudLeft.textContent = `Skor: ${score} | Can: ${lives}`;
+            if (lives <= 0) {
+              gameStage.innerHTML = `
+                <div class="game-box">
+                  <h3>Canların Bitti!</h3>
+                  <p>Skorun: <strong>${score}</strong></p>
+                  <button class="play-btn" style="max-width:200px" onclick="openGame('${id}')">Tekrar Oyna</button>
+                </div>`;
+            } else {
+              round();
+            }
+          });
+        });
+      }
+
+      hudLeft.textContent = `Skor: 0 | Can: ${lives}`;
+      round();
+      cleanupGame = () => {};
+    }
+
+    // 5. Sayı Tahmini
+    function startGuessGame(id) {
+      const secret = Math.floor(Math.random() * 100) + 1;
+      let tries = 0;
+      gameHelp.textContent = "1-100 arası bir sayı gir ve Tahmin Et butonuna bas.";
+      hudLeft.textContent = "Deneme: 0";
+
+      gameStage.innerHTML = `
+        <div class="game-box">
+          <h3>1 ile 100 Arasında Bir Sayı Tuttum</h3>
+          <input type="number" id="guessInput" min="1" max="100" placeholder="Sayı..." />
+          <button class="play-btn" style="max-width:180px" id="guessBtn">Tahmin Et</button>
+          <p id="guessMsg" style="color:var(--warn);font-weight:700"></p>
+        </div>`;
+
+      const input = document.getElementById("guessInput");
+      const msg = document.getElementById("guessMsg");
+
+      document.getElementById("guessBtn").addEventListener("click", () => {
+        const val = Number(input.value);
+        if (!val || val < 1 || val > 100) {
+          msg.textContent = "1 ile 100 arasında bir sayı yaz.";
+          return;
+        }
+        tries++;
+        hudLeft.textContent = `Deneme: ${tries}`;
+
+        if (val === secret) {
+          const pts = Math.max(10, 110 - tries * 10);
+          saveBest(id, pts);
+          hudRight.textContent = `Rekor: ${getBest(id)}`;
+          gameStage.innerHTML = `
+            <div class="game-box">
+              <h3>Bildin! Sayı: ${secret}</h3>
+              <p>${tries} denemede buldun — Puan: <strong>${pts}</strong></p>
+              <button class="play-btn" style="max-width:200px" onclick="openGame('${id}')">Yeni Sayı</button>
+            </div>`;
+        } else if (val < secret) {
+          msg.textContent = "Daha BÜYÜK bir sayı dene ↑";
+        } else {
+          msg.textContent = "Daha KÜÇÜK bir sayı dene ↓";
+        }
+      });
+
+      cleanupGame = () => {};
+    }
+
+    renderCards();
+  </script>
+</body>
+</html>
